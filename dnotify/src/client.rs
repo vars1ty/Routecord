@@ -24,8 +24,9 @@ pub struct DNotify {
 impl DNotify {
     /// Tries to start the client.
     pub async fn start() {
-        let token =
-            std::env::var("TOKEN").expect("[ERROR] Missing TOKEN=... environment variable!");
+        let token = std::env::args()
+            .nth(1)
+            .expect("[ERROR] Missing argument for token, usage: ./dnotify TOKEN_HERE");
         let intents = GatewayIntents::DIRECT_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
 
         let mut client = Client::builder(token, intents)
