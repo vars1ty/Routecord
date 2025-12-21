@@ -1,0 +1,14 @@
+[package]
+name = "dnotify"
+description = "Discord selfbot program to send notifications for messages."
+version = "1.0.0"
+authors = [ "vars1ty <gh@resistant.ch>" ]
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread"] }
+serenity = { git = "https://github.com/vars1ty/serenity.git" }
+notify-rust = { version = "4.11.7", features = [ "images" ] }
+reqwest = "0.12.26"
+dashmap = "6.1.0"
+image = "0.25.9"
