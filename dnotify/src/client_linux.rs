@@ -19,6 +19,9 @@ pub struct DNotify {
     /// - `Key`: User ID
     /// - `Value`: Avatar Data
     cached_avatars: DashMap<u64, Arc<AvatarData>>,
+
+    /// Host User ID.
+    host_user_id: u64,
 }
 
 impl DNotify {
@@ -26,12 +29,20 @@ impl DNotify {
     pub async fn start() {
         let token = std::env::args()
             .nth(1)
-            .expect("[ERROR] Missing argument for token, usage: ./dnotify TOKEN_HERE");
+            .expect("[ERROR] Missing argument for Token, usage: ./dnotify TOKEN_HERE HOST_USER_ID");
+        let host_user_id: u64 = std::env::args()
+            .nth(2)
+            .expect(
+                "[ERROR] Missing argument for host User ID, usage: ./dnotify TOKEN_HERE HOST_USER_ID",
+            )
+            .parse()
+            .expect("[ERROR] Failed parsing User ID as u64!");
         let intents = GatewayIntents::DIRECT_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
 
         let mut client = Client::builder(token, intents)
             .event_handler(Self {
                 cached_avatars: DashMap::new(),
+                host_user_id,
             })
             .await
             .expect("[ERROR] Failed creating client!");
@@ -112,6 +123,10 @@ impl DNotify {
 #[async_trait]
 impl EventHandler for DNotify {
     async fn message(&self, _ctx: Context, msg: Message) {
+        if msg.author.id == self.host_user_id {
+            return;
+        }
+
         self.display_notification(msg).await;
     }
 }

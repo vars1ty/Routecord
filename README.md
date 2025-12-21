@@ -19,8 +19,8 @@ Note that it does not currently support servers, and is very much work-in-progre
 It also doesn't care if you are in Do not Disturb; It'll still show a notification.
 
 ## Usage
-- Windows: `./dnotify.exe TOKEN_HERE`
-- Linux: `./dnotify TOKEN_HERE`
+- Windows: `./dnotify.exe TOKEN_HERE HOST_USER_ID`
+- Linux: `./dnotify TOKEN_HERE HOST_USER_ID`
 
 ## Download
 See [releases](https://github.com/vars1ty/DNotify/releases).
