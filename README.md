@@ -5,6 +5,9 @@ An alternative Discord notification system for direct messages.
 > [!CAUTION]
 > This acts as a **selfbot** and requires your User Token, proceed at your own risk!
 
+> [!WARNING]  
+> **Windows**: Images for notifications are currently **not** supported!
+
 ## Why
 Because alternative clients like GoofCord and alike don't properly send notifications, but can play the ping sound.
 
