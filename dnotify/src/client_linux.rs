@@ -12,7 +12,7 @@ pub struct AvatarData {
     url: String,
 }
 
-/// Discord Notify structure.
+/// **Linux-variant**: Discord Notify structure.
 pub struct DNotify {
     /// Cached avatars.
     ///
