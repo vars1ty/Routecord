@@ -23,4 +23,4 @@ It also doesn't care if you are in Do not Disturb; It'll still show a notificati
 - Linux: `./dnotify TOKEN_HERE`
 
 ## Download
-See (releases)[https://github.com/vars1ty/DNotify/releases].
+See [releases](https://github.com/vars1ty/DNotify/releases).
