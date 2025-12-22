@@ -11,6 +11,14 @@ dashmap = "6.1.0"
 image = "0.25.9"
 
 [dependencies]
-tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread"] }
 serenity = { git = "https://github.com/vars1ty/serenity.git" }
 notify-rust = { version = "4.11.7", features = [ "images" ] }
+tokio = { version = "1.48.0", features = ["macros"] }
+
+[profile.release]
+incremental = true
+codegen-units = 1
+panic = "abort"
+opt-level = "z"
+strip = true
+lto = "fat"

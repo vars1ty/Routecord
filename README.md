@@ -1,7 +1,6 @@
 # DNotify
 An alternative Discord notification system for direct messages.
 
-
 > [!CAUTION]
 > This acts as a **selfbot** and requires your User Token, proceed at your own risk!
 
@@ -21,6 +20,10 @@ It also doesn't care if you are in Do not Disturb; It'll still show a notificati
 ## Usage
 - Windows: `./dnotify.exe TOKEN_HERE HOST_USER_ID`
 - Linux: `./dnotify TOKEN_HERE HOST_USER_ID`
+
+### Fallback Methods
+1. Environment Variable(s): `TOKEN`, `HOST_USER_ID`
+2. File(s): `./token.txt`, `./host_user_id.txt`
 
 ## Download
 See [releases](https://github.com/vars1ty/DNotify/releases).

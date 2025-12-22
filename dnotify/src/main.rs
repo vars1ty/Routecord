@@ -11,7 +11,7 @@ mod client_linux;
 mod client_windows;
 
 /// Main startup function.
-#[tokio::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() {
     DNotify::start().await;
 }

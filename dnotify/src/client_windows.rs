@@ -10,20 +10,28 @@ pub struct DNotify {
 impl DNotify {
     /// Tries to start the client.
     pub async fn start() {
-        let token = std::env::args()
-            .nth(1)
-            .expect("[ERROR] Missing argument for Token, usage: ./dnotify TOKEN_HERE HOST_USER_ID");
+        let token = std::env::args().nth(1).unwrap_or_else(|| {
+            std::env::var("TOKEN").unwrap_or_else(|_| {
+                std::fs::read_to_string("./token.txt").expect(
+                    "[ERROR] Missing argument for Token, usage: ./dnotify TOKEN_HERE HOST_USER_ID",
+                )
+            })
+        });
         let host_user_id: u64 = std::env::args()
-            .nth(2)
-            .expect(
-                "[ERROR] Missing argument for host User ID, usage: ./dnotify TOKEN_HERE HOST_USER_ID",
-            )
+            .nth(2).unwrap_or_else(|| std::env::var("HOST_USER_ID")
+                .unwrap_or_else(|_|
+                    std::fs::read_to_string("./host_user_id.txt")
+                        .expect("[ERROR] Missing argument for Host User ID, usage: ./dnotify TOKEN_HERE HOST_USER_ID")))
             .parse()
-            .expect("[ERROR] Failed parsing User ID as u64!");
+            .expect("[ERROR] Failed parsing Host User ID as u64!");
+
         let intents = GatewayIntents::DIRECT_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
 
         let mut client = Client::builder(token, intents)
-            .event_handler(Self { host_user_id })
+            .event_handler(Self {
+                cached_avatars: DashMap::new(),
+                host_user_id,
+            })
             .await
             .expect("[ERROR] Failed creating client!");
         client

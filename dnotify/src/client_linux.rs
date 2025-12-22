@@ -27,16 +27,21 @@ pub struct DNotify {
 impl DNotify {
     /// Tries to start the client.
     pub async fn start() {
-        let token = std::env::args()
-            .nth(1)
-            .expect("[ERROR] Missing argument for Token, usage: ./dnotify TOKEN_HERE HOST_USER_ID");
+        let token = std::env::args().nth(1).unwrap_or_else(|| {
+            std::env::var("TOKEN").unwrap_or_else(|_| {
+                std::fs::read_to_string("./token.txt").expect(
+                    "[ERROR] Missing argument for Token, usage: ./dnotify TOKEN_HERE HOST_USER_ID",
+                )
+            })
+        });
         let host_user_id: u64 = std::env::args()
-            .nth(2)
-            .expect(
-                "[ERROR] Missing argument for host User ID, usage: ./dnotify TOKEN_HERE HOST_USER_ID",
-            )
+            .nth(2).unwrap_or_else(|| std::env::var("HOST_USER_ID")
+                .unwrap_or_else(|_|
+                    std::fs::read_to_string("./host_user_id.txt")
+                        .expect("[ERROR] Missing argument for Host User ID, usage: ./dnotify TOKEN_HERE HOST_USER_ID")))
             .parse()
-            .expect("[ERROR] Failed parsing User ID as u64!");
+            .expect("[ERROR] Failed parsing Host User ID as u64!");
+
         let intents = GatewayIntents::DIRECT_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
 
         let mut client = Client::builder(token, intents)
@@ -52,10 +57,16 @@ impl DNotify {
             .expect("[ERROR] Failed starting client!");
     }
 
+    /// Tries to get the avatar url for `author`, capping the size
+    /// at `32` pixels as we don't need higher for a basic thumbnail icon.
+    fn get_avatar_url(&self, author: &User) -> Option<String> {
+        Some(author.avatar_url()?.replace("size=1024", "size=32"))
+    }
+
     /// **Expensive**: Gets the remote avatar for `author`, if any is present
     /// and assuming it could be successfully read and converted.
     async fn get_remote_avatar(&self, author: &User) -> Option<Arc<AvatarData>> {
-        let avatar_url = author.avatar_url()?;
+        let avatar_url = self.get_avatar_url(author)?;
         if let Ok(image_response) = reqwest::get(&avatar_url).await
             && let Ok(image_bytes) = image_response.bytes().await
             && let Ok(image) = image::load_from_memory(&image_bytes)
@@ -80,7 +91,7 @@ impl DNotify {
     /// It first looks in the local cache and validates it, otherwise it tries
     /// to get the remote avatar, cache it and return.
     async fn get_avatar(&self, author: &User) -> Option<Arc<AvatarData>> {
-        let avatar_url = author.avatar_url()?;
+        let avatar_url = self.get_avatar_url(author)?;
 
         if let Some(cached_avatar_data) = self.cached_avatars.get(&author.id.get()) {
             // If the URL doesn't match, update the entry and return.
