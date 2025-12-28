@@ -10,18 +10,26 @@ mod utils;
 async fn main() {
     let config = Arc::new(Config::new().expect("[ERROR] Failed creating Config instance!"));
     let config_clone = Arc::clone(&config);
+    let enable_notifications = config.enable_notifications();
 
     if config.enable_rpc() {
-        tokio::task::spawn(async move {
-            let mut rpc = DiscordRPC::new(config_clone)
-                .await
-                .expect("[ERROR] Failed starting Discord RPC!");
+        let mut rpc = DiscordRPC::new(config_clone)
+            .await
+            .expect("[ERROR] Failed starting Discord RPC!");
+
+        if !enable_notifications {
             rpc.start_process_watcher().await;
-        });
+        } else {
+            tokio::task::spawn(async move {
+                rpc.start_process_watcher().await;
+            });
+        }
     }
 
-    if !config.enable_notifications() {
-        return;
+    if !enable_notifications {
+        loop {
+            std::thread::sleep(std::time::Duration::from_secs(1));
+        }
     }
 
     #[cfg(target_os = "windows")]
@@ -29,4 +37,7 @@ async fn main() {
 
     #[cfg(target_os = "linux")]
     crate::features::linux::discord_client::DNotify::start(config).await;
+    loop {
+        std::thread::sleep(std::time::Duration::from_secs(1));
+    }
 }
