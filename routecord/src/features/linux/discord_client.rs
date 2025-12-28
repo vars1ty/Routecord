@@ -1,7 +1,9 @@
 use dashmap::DashMap;
 use notify_rust::Notification;
-use serenity::{Client, all::*, async_trait};
+use serenity_self::{Client, all::*, async_trait};
 use std::sync::Arc;
+
+use crate::config::Config;
 
 /// Holds extra information about an avatar.
 pub struct AvatarData {
@@ -26,28 +28,13 @@ pub struct DNotify {
 
 impl DNotify {
     /// Tries to start the client.
-    pub async fn start() {
-        let token = std::env::args().nth(1).unwrap_or_else(|| {
-            std::env::var("TOKEN").unwrap_or_else(|_| {
-                std::fs::read_to_string("./token.txt").expect(
-                    "[ERROR] Missing argument for Token, usage: ./dnotify TOKEN_HERE HOST_USER_ID",
-                )
-            })
-        });
-        let host_user_id: u64 = std::env::args()
-            .nth(2).unwrap_or_else(|| std::env::var("HOST_USER_ID")
-                .unwrap_or_else(|_|
-                    std::fs::read_to_string("./host_user_id.txt")
-                        .expect("[ERROR] Missing argument for Host User ID, usage: ./dnotify TOKEN_HERE HOST_USER_ID")))
-            .parse()
-            .expect("[ERROR] Failed parsing Host User ID as u64!");
-
+    pub async fn start(config: Arc<Config>) {
         let intents = GatewayIntents::DIRECT_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
 
-        let mut client = Client::builder(token, intents)
+        let mut client = Client::builder(config.get_token(), intents)
             .event_handler(Self {
                 cached_avatars: DashMap::new(),
-                host_user_id,
+                host_user_id: config.get_user_id(),
             })
             .await
             .expect("[ERROR] Failed creating client!");
@@ -119,7 +106,7 @@ impl DNotify {
         let mut notification = notification
             .summary(msg.author.display_name())
             .body(&msg.content)
-            .appname("DNotify");
+            .appname("Routecord");
 
         if let Some(avatar_data) = self.get_avatar(&msg.author).await {
             notification = notification.image_data(avatar_data.image.clone());

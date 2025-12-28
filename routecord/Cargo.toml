@@ -1,8 +1,8 @@
 [package]
-name = "dnotify"
-description = "Discord selfbot program to send notifications for messages."
+name = "routecord"
+description = "Routecord reimplement/reroute base Discord features to work better."
 version = "1.0.1"
-authors = [ "vars1ty <gh@resistant.ch>" ]
+authors = ["vars1ty <gh@resistant.ch>"]
 edition = "2024"
 
 [target.'cfg(target_os = "linux")'.dependencies]
@@ -11,9 +11,13 @@ dashmap = "6.1.0"
 image = "0.25.9"
 
 [dependencies]
-serenity = { git = "https://github.com/vars1ty/serenity.git" }
+sysinfo = { version = "0.37.2", default-features = false, features = ["system"] }
 notify-rust = { version = "4.11.7", features = [ "images" ] }
 tokio = { version = "1.48.0", features = ["macros"] }
+yet-another-discord-rpc = "0.1.0"
+serenity_self = "0.13.3"
+serde_json = "1.0.147"
+anyhow = "1.0.100"
 
 [profile.release]
 incremental = true
